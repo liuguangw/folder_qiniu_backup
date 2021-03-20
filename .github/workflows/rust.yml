@@ -20,3 +20,12 @@ jobs:
       run: cargo build --verbose
     - name: Run list files
       run: ls target
+    - name: Archive production artifacts
+      uses: actions/upload-artifact@v2
+      with:
+          name: output
+          path: |
+            debug
+            !debug/.fingerprint/**
+            !debug/build/**
+            !debug/deps/**
