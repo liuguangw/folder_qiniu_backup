@@ -17,15 +17,15 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: Build
-      run: cargo build --verbose
+      run: cargo build --verbose --release
     - name: Run list files
-      run: ls target
+      run: ls target/release
     - name: Archive production artifacts
       uses: actions/upload-artifact@v2
       with:
           name: output
           path: |
-            debug
-            !debug/.fingerprint/**
-            !debug/build/**
-            !debug/deps/**
+            target/release
+            !target/release/.fingerprint/**
+            !target/release/build/**
+            !target/release/deps/**
