@@ -5,7 +5,7 @@ pub async fn clean_old_backup_files(
     path_prefix: &str,
     access_key: &str,
     secret_key: &str,
-) {
+) -> Result<(), String> {
     println!("clean expired backup files ...");
     let time_now = Local::now();
     for i in (10..=20i64).rev() {
@@ -15,7 +15,7 @@ pub async fn clean_old_backup_files(
         let backup_path = format!("{}{}.zip", path_prefix, date_string);
         let backup_status =
             super::super::qiniu::get_file_status(bucket_name, &backup_path, access_key, secret_key)
-                .await;
+                .await?;
         match backup_status {
             200 => {
                 println!("delete file: {}", backup_path);
@@ -25,15 +25,17 @@ pub async fn clean_old_backup_files(
                     access_key,
                     secret_key,
                 )
-                .await;
+                    .await?;
                 match delete_status {
                     200 => println!("delete success"),
                     612 => println!("not exists, skip..."),
-                    _ => eprintln!("error: {}", backup_status),
+                    _ => eprintln!("unknown status"),
                 }
             }
+            401 => return Err(format!("ERROR {}", backup_status)),
             612 => println!("not exists, skip"),
-            _ => eprintln!("error: {}", backup_status),
-        }
+            _ => return Err(format!("unknown status: {}", backup_status))
+        };
     }
+    Ok(())
 }

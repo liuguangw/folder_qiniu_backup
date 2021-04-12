@@ -1,6 +1,7 @@
 use hmac::{Hmac, Mac, NewMac};
 use sha1::Sha1;
 
+//计算管理资源的token
 pub fn get_admin_token(
     method: &str,
     host_name: &str,
