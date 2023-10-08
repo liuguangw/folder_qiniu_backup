@@ -33,6 +33,6 @@ pub async fn delete_file(
         .await;
     match response_result {
         Ok(response) => Ok(response.status().as_u16()),
-        Err(err) => Err(err.to_string())
+        Err(err) => Err(err.to_string()),
     }
 }

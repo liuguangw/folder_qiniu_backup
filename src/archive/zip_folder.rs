@@ -27,29 +27,26 @@ fn ad_items_to_zip<P: AsRef<Path>>(
         .compression_method(zip::CompressionMethod::Bzip2)
         .unix_permissions(0o755);
     zip.add_directory(&sub_context_prefix, options)?;
-    for entry in fs::read_dir(src_folder)? {
-        if let Ok(item_entry) = entry {
-            if let Ok(file_type) = item_entry.file_type() {
-                let item_name = item_entry.file_name();
-                let item_name = item_name.to_str().unwrap();
-                let item_path = item_entry.path();
-                if file_type.is_file() {
-                    let zip_path_name = format!("{}{}", sub_context_prefix, item_name);
-                    println!("add file {}", zip_path_name);
-                    zip.start_file(&zip_path_name, options)?;
-                    let file_content = fs::read(item_path)?;
-                    zip.write_all(&file_content)?;
-                } else if file_type.is_dir() {
-                    ad_items_to_zip(zip, item_path, &sub_context_prefix)?;
-                    //println!("{:?}", item_path);
-                    //dir_list.push(item_path);
-                }
-                // Now let's show our entry's file type!
-                //println!("{:?}: {:?}", item_entry.path(), file_type);
+    for item_entry in (fs::read_dir(src_folder)?).flatten() {
+        if let Ok(file_type) = item_entry.file_type() {
+            let item_name = item_entry.file_name();
+            let item_name = item_name.to_str().unwrap();
+            let item_path = item_entry.path();
+            if file_type.is_file() {
+                let zip_path_name = format!("{}{}", sub_context_prefix, item_name);
+                println!("add file {}", zip_path_name);
+                zip.start_file(&zip_path_name, options)?;
+                let file_content = fs::read(item_path)?;
+                zip.write_all(&file_content)?;
+            } else if file_type.is_dir() {
+                ad_items_to_zip(zip, item_path, &sub_context_prefix)?;
+                //println!("{:?}", item_path);
+                //dir_list.push(item_path);
             }
-            //else {
-            //println!("Couldn't get file type for {:?}", item_entry.path());
-            //}
+            // Now let's show our entry's file type!
+            //println!("{:?}: {:?}", item_entry.path(), file_type);
+        } else {
+            println!("Couldn't get file type for {:?}", item_entry.path());
         }
         //println!("===== {:?}", src_folder.as_ref());
     }

@@ -28,7 +28,7 @@ pub async fn upload_file_to_server<P: AsRef<Path>>(
         .part("file", file_part);
     let response_result = client
         .post("https://up-z2.qiniup.com/")
-        .header("User-Agent", "folder_qiniu_backup/1.0")
+        .header("User-Agent", "folder_qiniu_backup/1.1")
         .multipart(form)
         .send()
         .await;
@@ -41,6 +41,6 @@ pub async fn upload_file_to_server<P: AsRef<Path>>(
                 eprintln!("error: {}\n{}", err, response.text().await.unwrap())
             }
         },
-        Err(err) => eprintln!("error: {}", err.to_string()),
+        Err(err) => eprintln!("error: {err}"),
     }
 }

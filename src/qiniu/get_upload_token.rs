@@ -1,5 +1,7 @@
 use super::PutPolicy;
-use hmac::{Hmac, Mac, NewMac};
+use base64::engine::general_purpose;
+use base64::Engine;
+use hmac::{Hmac, Mac};
 use sha1::Sha1;
 use std::ops::Add;
 use std::time::{Duration, SystemTime};
@@ -31,12 +33,12 @@ pub fn get_upload_token(
         return_body: return_body.to_string(),
     };
     let put_policy = serde_json::to_string(&put_policy).unwrap();
-    let encoded_put_policy = base64::encode_config(put_policy.as_bytes(), base64::URL_SAFE);
+    let encoded_put_policy = general_purpose::URL_SAFE.encode(put_policy.as_bytes());
     let mut mac =
-        Hmac::<Sha1>::new_varkey(secret_key.as_bytes()).expect("HMAC can take key of any size");
+        Hmac::<Sha1>::new_from_slice(secret_key.as_bytes()).expect("HMAC can take key of any size");
     mac.update(encoded_put_policy.as_bytes());
     let sign_result = mac.finalize();
     let sign_result = sign_result.into_bytes();
-    let encoded_sign = base64::encode_config(&sign_result, base64::URL_SAFE);
+    let encoded_sign = general_purpose::URL_SAFE.encode(sign_result);
     format!("{}:{}:{}", access_key, &encoded_sign, &encoded_put_policy)
 }

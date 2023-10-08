@@ -2,8 +2,8 @@ use chrono::Local;
 use folder_qiniu_backup::archive::zip_folder;
 use folder_qiniu_backup::qiniu;
 use folder_qiniu_backup::tools;
-use std::{env, process};
 use std::path::Path;
+use std::{env, process};
 use tokio::fs;
 
 #[tokio::main]
@@ -20,8 +20,10 @@ async fn main() {
     let parent_path = src_path.parent().unwrap();
     let output_path = parent_path.join("tmp_backup.zip");
     //清理过期的备份
-    if let Err(clean_error) = tools::clean_old_backup_files(&bucket_name, &object_path_prefix,
-                                                            &access_key, &secret_key).await {
+    if let Err(clean_error) =
+        tools::clean_old_backup_files(&bucket_name, &object_path_prefix, &access_key, &secret_key)
+            .await
+    {
         eprintln!("clean error: {}", clean_error);
         process::exit(-1);
     }
@@ -41,7 +43,7 @@ async fn main() {
         &access_key,
         &secret_key,
     )
-        .await;
+    .await;
     //clean tmp zip file
     match fs::remove_file(&output_path).await {
         Ok(_) => println!("complete"),

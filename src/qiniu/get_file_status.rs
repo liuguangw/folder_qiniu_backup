@@ -5,7 +5,7 @@ pub async fn get_file_status(
     save_path: &str,
     access_key: &str,
     secret_key: &str,
-) -> Result<u16,String> {
+) -> Result<u16, String> {
     let method = "POST";
     let host_name = "rs.qiniu.com";
     let path = format!(
@@ -32,11 +32,7 @@ pub async fn get_file_status(
         .send()
         .await;
     match response_result {
-        Ok(response) => {
-            Ok(response.status().as_u16())
-        },
-        Err(err) => {
-            Err(err.to_string())
-        }
+        Ok(response) => Ok(response.status().as_u16()),
+        Err(err) => Err(err.to_string()),
     }
 }

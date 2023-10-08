@@ -25,7 +25,7 @@ pub async fn clean_old_backup_files(
                     access_key,
                     secret_key,
                 )
-                    .await?;
+                .await?;
                 match delete_status {
                     200 => println!("delete success"),
                     612 => println!("not exists, skip..."),
@@ -34,7 +34,7 @@ pub async fn clean_old_backup_files(
             }
             401 => return Err(format!("ERROR {}", backup_status)),
             612 => println!("not exists, skip"),
-            _ => return Err(format!("unknown status: {}", backup_status))
+            _ => return Err(format!("unknown status: {}", backup_status)),
         };
     }
     Ok(())
